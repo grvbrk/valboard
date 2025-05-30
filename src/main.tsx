@@ -1,7 +1,5 @@
 import { Devvit, useState } from '@devvit/public-api';
 import { UpcomingMatchesShowForm } from './forms/UpcomingMatchesShowForm.js';
-import { LiveMatchPage } from './pages/LiveMatchPage.js';
-import { MatchResultsPage } from './pages/MatchResultsPage.js';
 import {
   AllLiveMatchesData,
   AllMatchResults,
@@ -9,9 +7,12 @@ import {
   PageType,
 } from './core/types.js';
 import { getMatchPageTypeFromRedis } from './redis/matches.js';
-import { UpcomingMatchPage } from './pages/UpcomingMatchPage.js';
+import { UpcomingMatchPage } from './pages/upcoming/UpcomingMatchPage.js';
 import { LiveMatchesShowForm } from './forms/LiveMatchesShowForm.js';
 import { MatchResultsShowForm } from './forms/MatchResultsShowForm.js';
+import { LiveMatchPage } from './pages/live/LiveMatchPage.js';
+import { MatchResultsPage } from './pages/result/MatchResultsPage.js';
+import { TradingPage } from './TradingPage.js';
 
 Devvit.addSettings([
   {
@@ -24,11 +25,11 @@ Devvit.addSettings([
 ]);
 
 Devvit.configure({
-  redditAPI: true,
   http: true,
+  redditAPI: true,
   redis: true,
-  realtime: true,
   media: true,
+  realtime: true,
 });
 
 Devvit.addMenuItem({
@@ -169,8 +170,9 @@ Devvit.addCustomPostType({
     });
 
     return (
-      <blocks height="regular">
-        {(() => {
+      <blocks>
+        <TradingPage />
+        {/* {(() => {
           switch (page) {
             case PageType.UPCOMING:
               return <UpcomingMatchPage setPage={setPage} />;
@@ -179,7 +181,7 @@ Devvit.addCustomPostType({
             case PageType.RESULTS:
               return <MatchResultsPage />;
           }
-        })()}
+        })()} */}
       </blocks>
     );
   },
