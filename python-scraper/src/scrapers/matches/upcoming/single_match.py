@@ -1,4 +1,5 @@
-import requests
+from src.scrapers.http import fetch_page
+from src.scrapers.players import parse_roster, split_team_rows, stats_container, team_tag
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
@@ -9,14 +10,14 @@ def get_ordinal(n):
     )
 
 
-def scrape_single_upcoming_match(url: str):
+async def scrape_single_upcoming_match(url: str):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
     }
 
     results = []
 
-    response = requests.get(url, headers=headers)
+    response = await fetch_page(url, headers)
     if response.status_code != 200:
         return {"data": {"status": response.status_code, "segments": results}}
 
@@ -75,25 +76,16 @@ def scrape_single_upcoming_match(url: str):
 
     # _________________________________________ #
 
-    players_info = soup.select("div.vm-stats-game")[0].select("table")
-    team1_players = players_info[0].select("tbody tr")
-    team2_players = players_info[1].select("tbody tr")
+    # Rosters may not be published yet for a match far out; that is a normal
+    # state, so fall back to an empty roster instead of failing the request.
+    container = stats_container(soup)
+    team1_players, team2_players = split_team_rows(container) if container else ([], [])
 
-    team1_short = team1_players[0].select_one(".ge-text-light").getText().strip()
-    team2_short = team2_players[0].select_one(".ge-text-light").getText().strip()
+    team1_short = team_tag(team1_players) or team1[:3].upper()
+    team2_short = team_tag(team2_players) or team2[:3].upper()
 
-    players1 = []
-    players2 = []
-
-    for idx, player in enumerate(team1_players):
-        name = player.select_one(".text-of").getText().strip()
-        player_flag = "".join(player.select_one("i").get("class")).replace("mod", "")
-        players1.append({"id": idx + 1, "name": name, "flag": player_flag})
-
-    for idx, player in enumerate(team2_players):
-        name = player.select_one(".text-of").getText().strip()
-        player_flag = "".join(player.select_one("i").get("class")).replace("mod", "")
-        players2.append({"id": idx + 1, "name": name, "flag": player_flag})
+    players1 = parse_roster(team1_players)
+    players2 = parse_roster(team2_players)
 
     results.append(
         {

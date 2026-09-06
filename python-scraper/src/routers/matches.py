@@ -19,7 +19,7 @@ router = APIRouter()
 
 @router.get("/match/upcoming/all")
 async def get_matches() -> AllUpcomingMatchesResponse:
-    return scrape_all_upcoming_matches()
+    return await scrape_all_upcoming_matches()
 
 
 @router.get("/match/upcoming/single")
@@ -33,12 +33,12 @@ async def get_matches(
         ),
     ] = None,
 ) -> SingleUpcomingMatchResponse:
-    return scrape_single_upcoming_match(url)
+    return await scrape_single_upcoming_match(url)
 
 
 @router.get("/match/live/all")
 async def get_matches() -> AllLiveMatchesResponse:
-    return scrape_all_live_matches()
+    return await scrape_all_live_matches()
 
 
 @router.get("/match/live/single")
@@ -52,12 +52,12 @@ async def get_matches(
         ),
     ] = None,
 ) -> SingleLiveMatchResponse:
-    return scrape_single_live_match(url)
+    return await scrape_single_live_match(url)
 
 
 @router.get("/match/results/all")
 async def get_matches() -> AllMatchResultsResponse:
-    return scrape_all_match_results()
+    return await scrape_all_match_results()
 
 
 @router.get("/match/results/single")
@@ -71,4 +71,4 @@ async def get_matches(
         ),
     ] = None,
 ) -> SingleMatchResultResponse:
-    return scrape_single_match_result(url)
+    return await scrape_single_match_result(url)

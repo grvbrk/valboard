@@ -1,9 +1,9 @@
-import requests
+from src.scrapers.http import fetch_page
 from datetime import datetime, timezone
 from bs4 import BeautifulSoup
 
 
-def scrape_all_upcoming_matches():
+async def scrape_all_upcoming_matches():
     url = "https://www.vlr.gg"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
@@ -11,7 +11,7 @@ def scrape_all_upcoming_matches():
 
     results = []
 
-    response = requests.get(url, headers=headers)
+    response = await fetch_page(url, headers)
     if response.status_code != 200:
         return {"data": {"status": response.status_code, "segments": results}}
 
